@@ -5,7 +5,7 @@ from utils.config import UPLOAD_DIR
 
 
 def get_repo_id(repo_url):
-    return hashlib.md5(repo_url).hexdigest()[:10]
+    return hashlib.md5(repo_url.encode()).hexdigest()[:10]
 
 
 def clone_repo(repo_url):
