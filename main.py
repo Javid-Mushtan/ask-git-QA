@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from utils.github_loader import clone_repo, get_repo_id
 from utils.file_loader import load_files
 from dotenv import load_dotenv
+from utils.vector_database import create_vector_database, load_vector_store
+
 app = FastAPI()
 
 load_dotenv()
@@ -40,6 +42,8 @@ async def process_repository(request: ProcessRequest,background_tasks: Backgroun
 def run_indexing(repo_url,repo_id):
     try:
         path = clone_repo(repo_url)
+        docs = load_files(path)
+        db = create_vector_database(docs)
         repo_status[repo_id] = "completed"
     except Exception as e:
         print(f"Error indexing {repo_id}: {e}")
