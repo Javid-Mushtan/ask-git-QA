@@ -15,7 +15,7 @@ TOP_K = 6
 SEARCH_TYPE = "cosine similarity"
 
 EMBEDDING_MODEL = "text-embedding-3-small"
-LANGUAGE_MODEL = "openrouter/free"
+LANGUAGE_MODEL = "nvidia/nemotron-3-ultra-550b-a55b:free"
 MAX_NEW_TOKENS = 1024
 TEMPERATURE = 0.2
 EMBEDDING_BATCH_SIZE = 100

@@ -8,11 +8,16 @@ from utils.config import (
     EMBEDDING_MODEL, EMBEDDING_BATCH_SIZE
 )
 
+
 def get_embeddings():
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        raise ValueError("OPENAI_API_KEY not found in environment variables")
-    return OpenAIEmbeddings(model=EMBEDDING_MODEL, api_key=api_key)
+        raise ValueError("OPENROUTER_API_KEY not found in environment variables.")
+    return OpenAIEmbeddings(
+            model=EMBEDDING_MODEL,
+            openai_api_key=api_key,
+            openai_api_base="https://openrouter.ai/api/v1"
+        )
 
 
 def create_vector_database(documents, repo_id):
@@ -25,13 +30,13 @@ def create_vector_database(documents, repo_id):
     embeddings = get_embeddings()
 
     persist_dir = os.path.join(VECTORSTORE_DIR, repo_id)
+
     if os.path.exists(persist_dir):
         try:
             shutil.rmtree(persist_dir)
             print("Existing vector store removed successfully.")
         except Exception as e:
             print(f"Warning: Could not remove directory: {e}")
-
 
     total_chunks = len(chunks)
 
@@ -42,13 +47,14 @@ def create_vector_database(documents, repo_id):
         persist_directory=persist_dir
     )
 
-    for i in range(EMBEDDING_BATCH_SIZE, total_chunks, CHUNK_SIZE):
-        batch = chunks[i:i + EMBEDDING_BATCH_SIZE]
+    for i in range(EMBEDDING_BATCH_SIZE, total_chunks, EMBEDDING_BATCH_SIZE):
+        batch = chunks[i: i + EMBEDDING_BATCH_SIZE]
         print(f"Embedding batch {i} to {min(i + EMBEDDING_BATCH_SIZE, total_chunks)}...")
         db.add_documents(batch)
 
-    print(f"Successfully created vector store for {repo_id} at {persist_dir}")
+    print(f"Successfully created vector store for {repo_id}")
     return db
+
 
 def load_vector_store(repo_id):
     embeddings = get_embeddings()
